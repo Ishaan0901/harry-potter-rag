@@ -32,5 +32,5 @@ chunks=splitter.split_documents(doc)
 store = Chroma.from_documents(
     documents=chunks,
     embedding=model,
-    persist_directory="database/vectorStore"
+    persist_directory="vectorStore"
 )
