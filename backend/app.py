@@ -1,6 +1,8 @@
 from langchain_groq import ChatGroq
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
+from langchain_core.runnables import RunnablePassthrough
+from langchain_core.prompts import ChatPromptTemplate
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -24,6 +26,9 @@ store = Chroma(
 #   Retriever:
 retriever = store.as_retriever()
 
+def format_docs(docs):
+    return "\n\n".join(doc.page_content for doc in docs)
+
 
 #   Chat Loop:
 while True :
@@ -32,10 +37,9 @@ while True :
     if question.strip().lower() in ["exit", "bye"]:
         break
 
-    docs=retriever.invoke(question)
-    context = "\n\n".join(doc.page_content for doc in docs)
+    # context = "\n\n".join(doc.page_content for doc in docs)
     
-    prompt=f'''
+    prompt = ChatPromptTemplate.from_template('''
     You are a Helpful assistant. 
     Answer the user's questions using the information provided in the retrieved context from the Harry Potter book.
 
@@ -47,9 +51,23 @@ while True :
     * Give clear and concise answers.
     * Do not mention the retrieval process unless asked.
 
-    question: {question},
-    context: {context}
-    '''
+    Context:
+    {context}
 
-    response=llm.invoke(prompt)
+    Question:
+    {question}
+    '''
+    )
+
+    chain = (
+    {
+        "context": retriever | format_docs,
+        "question": RunnablePassthrough()
+    }
+    | prompt
+    | llm
+)
+
+
+    response=chain.invoke(question)
     print(response.content)
