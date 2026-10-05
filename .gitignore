@@ -4,3 +4,4 @@ __pycache__/
 *.pyc
 vectorStore
 resources/harrypotter.pdf
+notes.ipynb

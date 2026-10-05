@@ -1,18 +1,14 @@
-import os
-import requests
+from langchain_groq import ChatGroq
+from langchain_huggingface import HuggingFaceEmbeddings
 from dotenv import load_dotenv
-
 load_dotenv()
 
-url = "https://api.groq.com/openai/v1/models"
 
-headers = {
-    "Authorization": f"Bearer {os.getenv('GROQ_API_KEY')}"
-}
+#   Models:
+llm=ChatGroq(
+    model='openai/gpt-oss-20b'
+)
 
-response = requests.get(url, headers=headers)
-
-data = response.json()
-
-for model in data["data"]:
-    print(model["id"])
+model = HuggingFaceEmbeddings(
+    model_name="BAAI/bge-small-en-v1.5"
+)

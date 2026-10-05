@@ -1,21 +1,7 @@
-from langchain_groq import ChatGroq
-from langchain_huggingface import HuggingFaceEmbeddings
+from models import llm,model
 from langchain_community.vectorstores import Chroma
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.prompts import ChatPromptTemplate
-from dotenv import load_dotenv
-load_dotenv()
-
-
-#   Models:
-llm=ChatGroq(
-    model='openai/gpt-oss-20b'
-)
-
-model = HuggingFaceEmbeddings(
-    model_name="BAAI/bge-small-en-v1.5"
-)
-
 
 #   Loading the database:
 store = Chroma(
@@ -31,13 +17,15 @@ def format_docs(docs):
 
 
 #   Chat Loop:
+history=[]
 while True :
     question=input('Human: ')
 
     if question.strip().lower() in ["exit", "bye"]:
         break
 
-    # context = "\n\n".join(doc.page_content for doc in docs)
+
+    history.append(f'HumanMessage:{question}')
     
     prompt = ChatPromptTemplate.from_template('''
     You are a Helpful assistant. 
@@ -56,18 +44,23 @@ while True :
 
     Question:
     {question}
+
+    history:
+    {history}
     '''
     )
 
     chain = (
     {
         "context": retriever | format_docs,
-        "question": RunnablePassthrough()
+        "question": RunnablePassthrough(),
+        "history": lambda _: history
     }
     | prompt
     | llm
 )
 
 
-    response=chain.invoke(question)
+    response = chain.invoke(question)   
     print(response.content)
+    history.append(f'AI_Message:{response.content}')
