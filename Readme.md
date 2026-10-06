@@ -2,7 +2,7 @@
 
 A Retrieval-Augmented Generation (RAG) chatbot that answers questions about a Harry Potter book using only the text of the book itself. Built with LangChain, ChromaDB, Hugging Face embeddings and Groq-hosted LLM inference.
 
-> 🚧 **Actively developed.** This project is updated regularly, and this README reflects the current state of the code.
+> ✅ **Project status: complete.** This is the final version of the project. It is a working command-line RAG chatbot, and no further development is planned.
 
 ---
 
@@ -53,12 +53,13 @@ The answering pipeline is composed with LangChain's runnable (LCEL) syntax: a di
 
 - **Python 3.10+**
 - [LangChain](https://python.langchain.com/): `langchain`, `langchain-community`, `langchain-core`, `langchain-text-splitters`
-- [LangGraph](https://langchain-ai.github.io/langgraph/): installed for upcoming agentic workflows
 - [ChromaDB](https://www.trychroma.com/): vector database
 - [Hugging Face](https://huggingface.co/BAAI/bge-small-en-v1.5) (`sentence-transformers`, `langchain-huggingface`): embedding model
 - [Groq](https://groq.com/) (`langchain-groq`): LLM inference
 - [pypdf](https://pypdf.readthedocs.io/): PDF parsing
 - `python-dotenv`: loads environment variables from `.env`
+
+> `langgraph` is listed in `requirements.txt` but is not used in the final version of the code.
 
 ---
 
@@ -160,17 +161,19 @@ Type `exit` or `bye` to quit.
 
 ---
 
-## 📝 Notes & Current Limitations
+## 📝 Known Limitations
 
 - **Re-indexing creates duplicates.** Running `main.py` again adds the chunks to the existing store a second time. Delete the `vectorStore/` folder before re-indexing.
 - **Retrieval uses only the latest question.** Chat history is passed to the LLM, but the vector search itself isn't rewritten using that history, so vague follow-ups may retrieve weaker context.
 - **History is unbounded.** The full conversation is appended to every prompt, so very long sessions will grow the prompt size.
-- **No source citations yet.** Answers don't show which pages they came from.
+- **No source citations.** Answers don't show which pages they came from.
 - **Copyright.** The PDF is excluded from version control because it is copyrighted material. Bring your own copy.
 
 ---
 
-## 🗺️ Roadmap
+## 🏁 Final Scope
+
+What this project includes:
 
 - [x] PDF ingestion: load, chunk, embed and persist in ChromaDB
 - [x] Retriever backed by the persisted vector store
@@ -178,8 +181,5 @@ Type `exit` or `bye` to quit.
 - [x] Command-line chat loop
 - [x] Conversation history in the prompt
 - [x] Shared model configuration (`models.py`)
-- [ ] Show source pages with each answer
-- [ ] History-aware retrieval (rewrite follow-up questions before searching)
-- [ ] Agentic workflow with LangGraph
-- [ ] Avoid duplicate chunks when re-indexing
-- [ ] Simple web UI
+
+Ideas for anyone who wants to extend it: show source pages with each answer, add history-aware retrieval, avoid duplicate chunks on re-indexing, or build a web UI.
